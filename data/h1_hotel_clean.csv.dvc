@@ -1,0 +1,5 @@
+outs:
+- md5: 524dff234b9c4efdb35aa61c15901081
+  size: 34639
+  hash: md5
+  path: h1_hotel_clean.csv
