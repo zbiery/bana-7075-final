@@ -39,7 +39,7 @@ def get_data(filename: str = "H1.csv") -> pd.DataFrame:
         logger.error(f"Failed to download file: {e}")
         raise
 
-    extracted_path = "data"
+    extracted_path = "data/raw"
     os.makedirs(extracted_path, exist_ok=True)
 
     try:
