@@ -67,7 +67,6 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         # Drop remaining NAs
         df = df.dropna()
         logger.info("Removed NAs.")
-
         logger.info("Data cleaning completed.")
         return df
 
@@ -151,7 +150,6 @@ def encode_data(df: pd.DataFrame) -> pd.DataFrame:
 
     try:
         encoded_df = pd.get_dummies(df, columns=["CustomerType", "DistributionChannel", "StayType", "DepositType"], drop_first=True)
-
         logger.info(f"One-hot encoding completed.")
         return encoded_df
 
@@ -186,36 +184,36 @@ def split_data(df: pd.DataFrame, target: str = "IsCanceled", test_size: float = 
 
 EXCLUDED_COLUMNS = ["HasBabies", "HasMeals", "HasParking", "IsCanceled"]
 
-def scale_train_data(train_df: pd.DataFrame, how: str = "min-max") -> Tuple[pd.DataFrame, Union[MinMaxScaler, StandardScaler]]:
+def scale_data(df: pd.DataFrame, how: str = "min-max") -> Tuple[pd.DataFrame, Union[MinMaxScaler, StandardScaler]]:
     """
     Fits a scaler on the training DataFrame and applies scaling to numeric features, 
     excluding predefined binary columns.
 
     Args:
-        train_df (pd.DataFrame): Training data to scale.
+        df (pd.DataFrame): Data to scale.
         how (str): Scaling method: 'min-max' or 'z-score'.
 
     Returns:
         Tuple: (scaled DataFrame, fitted scaler)
     """
-    logger.info(f"Fitting and scaling training data using {how} method.")
+    logger.info(f"Fitting and scaling data using {how} method.")
 
     try:
-        numeric_cols = train_df.select_dtypes(include=[np.number]).columns
+        numeric_cols = df.select_dtypes(include=[np.number]).columns
         cols_to_scale = [col for col in numeric_cols if col not in EXCLUDED_COLUMNS]
 
-        df_to_scale = train_df[cols_to_scale]
-        df_excluded = train_df.drop(columns=cols_to_scale)
+        df_to_scale = df[cols_to_scale]
+        df_excluded = df.drop(columns=cols_to_scale)
 
         scaler = MinMaxScaler() if how == "min-max" else StandardScaler()
         scaled = scaler.fit_transform(df_to_scale)
-        scaled_df = pd.DataFrame(scaled, columns=cols_to_scale, index=train_df.index)
+        scaled_df = pd.DataFrame(scaled, columns=cols_to_scale, index=df.index)
 
         result_df = pd.concat([scaled_df, df_excluded], axis=1)
-        result_df = result_df[train_df.columns]
+        result_df = result_df[df.columns]
 
-        logger.info("Training data scaled successfully.")
-        return result_df, scaler
+        logger.info("Data scaled successfully.")
+        return result_df
 
     except Exception as e:
         logger.error(f"Error in fit_and_scale_train: {e}")
