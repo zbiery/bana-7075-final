@@ -64,9 +64,9 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         ])
         logger.info("Removed unimportant columns.")
 
-        # Drop remaining NAs
-        df = df.dropna()
-        logger.info("Removed NAs.")
+        # # Drop remaining NAs
+        # df = df.dropna()
+        # logger.info("Removed NAs.")
         logger.info("Data cleaning completed.")
         return df
 
@@ -128,6 +128,7 @@ def create_features(df: pd.DataFrame) -> pd.DataFrame:
                               "StaysInWeekendNights", "StaysInWeekNights", 
                               "Meal", "Babies", "RequiredCarParkingSpaces"])
 
+        df = df.dropna()
         logger.info("Feature engineering completed.")
         return df
 
