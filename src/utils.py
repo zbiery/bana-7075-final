@@ -2,9 +2,6 @@ import logging
 from functools import wraps
 
 # Decorator to suppress gx logging messages
-import logging
-from functools import wraps
-
 def suppress_gx_logging(func):
     @wraps(func)
     def wrapper(*args, **kwargs):

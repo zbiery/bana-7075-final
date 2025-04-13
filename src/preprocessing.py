@@ -67,7 +67,6 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         # Drop remaining NAs
         df = df.dropna()
         logger.info("Removed NAs.")
-
         logger.info("Data cleaning completed.")
         return df
 
@@ -151,7 +150,6 @@ def encode_data(df: pd.DataFrame) -> pd.DataFrame:
 
     try:
         encoded_df = pd.get_dummies(df, columns=["CustomerType", "DistributionChannel", "StayType", "DepositType"], drop_first=True)
-
         logger.info(f"One-hot encoding completed.")
         return encoded_df
 
@@ -215,7 +213,7 @@ def scale_data(df: pd.DataFrame, how: str = "min-max") -> Tuple[pd.DataFrame, Un
         result_df = result_df[df.columns]
 
         logger.info("Data scaled successfully.")
-        return result_df, scaler
+        return result_df
 
     except Exception as e:
         logger.error(f"Error in fit_and_scale_train: {e}")
