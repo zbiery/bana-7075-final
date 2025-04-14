@@ -55,7 +55,11 @@ if mode == "Manual Entry":
         # The response is displayed on the Streamlit UI.
         if response.status_code == 200:
             prediction = response.json()["predictions"][0]
-            st.success(f"Predicted Demand: {prediction:.2f}")
+            if prediction == 0:
+                msg = "Non-Cancellation"
+            else:
+                msg = "Cancellation"
+            st.success(f"Prediction : {prediction}")
         else:
             st.error("Error fetching prediction. Check FastAPI logs.")
 
@@ -74,7 +78,7 @@ if mode == "Manual Entry":
 
                     if response.status_code == 200:
                         predictions = response.json()["predictions"]
-                        df["Predicted Demand"] = predictions
+                        df["Predictions"] = predictions
                         st.subheader("Predictions:")
                         st.dataframe(df)
                     else:

@@ -39,21 +39,33 @@ class InputData(BaseModel):
 @app.post("/predict")
 def predict_single(input_data: List[InputData]):
     """Endpoint for real-time predictions with a single input."""
-
-    # Convert input to DataFrame
-    df = pd.DataFrame([data.model_dump() for data in input_data])
-    df = encode_data(df)
-
     try:
-        try:
-            predictions = model.predict(df)
-            return {"predictions": predictions.tolist()}
-        except Exception as e:
-            import traceback
-            traceback.print_exc()  # Logs full traceback to console
-            raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+        df = pd.DataFrame([data.model_dump() for data in input_data])
+        
+        # One-hot encode to match training pipeline
+        df_encoded = encode_data(df)
+
+        # Fix boolean and int32 typing
+        df_encoded["HasBabies"] = df_encoded["HasBabies"].astype("int32")
+        df_encoded["HasMeals"] = df_encoded["HasMeals"].astype("int32")
+        df_encoded["HasParking"] = df_encoded["HasParking"].astype("int32")
+
+        # Add missing columns with default values (False)
+        expected_cols = model.metadata.get_input_schema().input_names()
+        for col in expected_cols:
+            if col not in df_encoded.columns:
+                df_encoded[col] = False
+
+        # ⬅️ Ensure correct column order
+        df_encoded = df_encoded[expected_cols]
+
+        predictions = model.predict(df_encoded)
+        return {"predictions": predictions.tolist()}
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
 
 @app.post("/predict_batch")
