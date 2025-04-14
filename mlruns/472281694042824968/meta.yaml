@@ -1,0 +1,6 @@
+artifact_location: file:///C:/Users/Zbier/source/repos/bana-7075-final/mlruns/472281694042824968
+creation_time: 1744599605811
+experiment_id: '472281694042824968'
+last_update_time: 1744599605811
+lifecycle_stage: active
+name: hotel_cancellation_lr

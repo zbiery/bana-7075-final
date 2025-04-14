@@ -3,23 +3,23 @@ import io
 from typing import List
 import mlflow.pyfunc
 import pandas as pd
-from dataclasses import dataclass
+# from dataclasses import dataclass
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel
+from src.preprocessing import encode_data
 
 # Initialize FastAPI app
 app = FastAPI()
 
 # Set experiment name
-mlflow.set_experiment("Forecasting Apple Demand")
+mlflow.set_tracking_uri("http://127.0.0.1:5000") 
+mlflow.set_experiment("hotel_cancellation_lr")
 
 # Load the trained model from MLflow
-MODEL_URI = "models:/apple_demand@champion"  # Replace with your model name and alias
+MODEL_URI = "models:/lr_champion/1"
 model = mlflow.pyfunc.load_model(MODEL_URI)
 
-
 # Define the expected input schema for a single prediction
-@dataclass
 class InputData(BaseModel):
     LeadTime: int
     Adults: int
@@ -35,8 +35,6 @@ class InputData(BaseModel):
     HasBabies: int
     HasMeals: int
     HasParking: int
-    IsCanceled: int
-
 
 @app.post("/predict")
 def predict_single(input_data: List[InputData]):
@@ -44,12 +42,16 @@ def predict_single(input_data: List[InputData]):
 
     # Convert input to DataFrame
     df = pd.DataFrame([data.model_dump() for data in input_data])
+    df = encode_data(df)
 
     try:
-        # Make predictions
-        predictions = model.predict(df)
-
-        return {"predictions": predictions.tolist()}
+        try:
+            predictions = model.predict(df)
+            return {"predictions": predictions.tolist()}
+        except Exception as e:
+            import traceback
+            traceback.print_exc()  # Logs full traceback to console
+            raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -88,7 +90,13 @@ async def predict_batch(file: UploadFile = File(...)):
             )
 
         # Make batch predictions
-        predictions = model.predict(df)
-        return {"predictions": predictions.tolist()}
+        try:
+            predictions = model.predict(df)
+            return {"predictions": predictions.tolist()}
+        except Exception as e:
+            import traceback
+            traceback.print_exc()  # Logs full traceback to console
+            raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

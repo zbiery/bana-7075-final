@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 
-FASTAPI_URL = "http://127.0.0.1:5000"
+FASTAPI_URL = "http://127.0.0.1:1000"
 
 st.set_page_config(page_title="Hotel Booking Prediction Model", layout="centered")
 
