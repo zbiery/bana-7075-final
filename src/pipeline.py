@@ -1,11 +1,12 @@
-from typing import Tuple
+from typing import Tuple, Union
 from pandas import DataFrame, Series
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from src.ingestion import get_data
 from src.preprocessing import clean_data, create_features, encode_data, scale_data, split_data
 from src.validation import validate_data, version_data
 from src.logger import logger
 
-def pipeline(model: str) -> Tuple[DataFrame,DataFrame,Series,Series]:
+def pipeline(model: str) -> Tuple[DataFrame,DataFrame,Series,Series] | Tuple[DataFrame,DataFrame,Series,Series, Union[StandardScaler, MinMaxScaler]]:
     """
     Runs the full data pipeline: ingest -> clean -> engineer -> validate -> encode/split/scale,
     depending on the model type.
@@ -32,18 +33,28 @@ def pipeline(model: str) -> Tuple[DataFrame,DataFrame,Series,Series]:
             raise RuntimeError("Pipeline halted due to failed data validation.")
 
         if model == "tree":
-            x_train, x_test, y_train, y_test = split_data(df_engineered, random_state=1234)
+            df_encoded = encode_data(df_engineered)
+            x_train, x_test, y_train, y_test = split_data(df_encoded, random_state=1234)
+            logger.info(f"SUCCESS: Pipeline for {model} succeeded.")
+            return x_train, x_test, y_train, y_test
         elif model == "glm" or model == "gam":
             df_encoded = encode_data(df_engineered)
             x_train, x_test, y_train, y_test = split_data(df_encoded, random_state=1234)
-        else:
+            logger.info(f"SUCCESS: Pipeline for {model} succeeded.")
+            return x_train, x_test, y_train, y_test
+        elif model == "nnet":
             df_encoded = encode_data(df_engineered)
             x_train, x_test, y_train, y_test = split_data(df_encoded, random_state=1234)
-            x_train = scale_data(x_train, how = "min-max")
-            x_test = scale_data(x_test, how="min-max")
+            x_train, scaler = scale_data(x_train, how="min-max")
+            x_test, _ = scale_data(x_test, scaler=scaler)
 
-        logger.info(f"SUCCESS: Pipeline succeeded.")
-        return x_train, x_test, y_train, y_test
+            # Explicitly cast to float32 to avoid torch.tensor conversion errors
+            x_train = x_train.astype("float32")
+            x_test = x_test.astype("float32")
+
+            logger.info(f"SUCCESS: Pipeline for {model} succeeded.")
+            return x_train, x_test, y_train, y_test, scaler
+
     
     except Exception as e:
         logger.error(f"FAILED: Pipeline failed: {str(e)}")

@@ -6,8 +6,16 @@ FASTAPI_URL = "http://127.0.0.1:1000"
 
 st.set_page_config(page_title="Hotel Booking Prediction Model", layout="centered")
 
-st.sidebar.title("Select Input Mode")
+st.sidebar.title("Model & Input Mode")
+model_type = st.sidebar.selectbox("Select Model Type", ["GLM", "Tree", "Neural Network"])
 mode = st.sidebar.radio("Choose input method:", ["Manual Entry", "Batch Upload"])
+
+model_map = {
+    "GLM": "glm",
+    "Tree": "tree",
+    "Neural Network": "nnet"
+}
+model_param = model_map[model_type]
 
 if mode == "Manual Entry":
     st.title("Hotel Booking Input Form")
@@ -46,44 +54,57 @@ if mode == "Manual Entry":
             "TotalNights": total_nights,
             "HasBabies": has_babies,
             "HasMeals": has_meals,
-            "HasParking": has_parking,
-            "IsCanceled": is_canceled
+            "HasParking": has_parking
         }]
 
-        response = requests.post(f"{FASTAPI_URL}/predict", json=input_data)
-        
-        # The response is displayed on the Streamlit UI.
-        if response.status_code == 200:
-            prediction = response.json()["predictions"][0]
-            if prediction == 0:
-                msg = "Non-Cancellation"
+        try:
+            response = requests.post(f"{FASTAPI_URL}/predict?model={model_param}", json=input_data)
+            if response.status_code == 200:
+                result = response.json()
+                prediction = result["predictions"][0]
+                probability = result.get("probabilities", [None])[0]
+                msg = "Cancellation" if prediction > 0.5 else "Non-Cancellation"
+
+                if probability is not None:
+                    st.success(f"Prediction: {prediction:.0f} ({msg}) — Probability: {probability:.2%}")
+                else:
+                    st.success(f"Prediction: {prediction:.0f} ({msg})")
             else:
-                msg = "Cancellation"
-            st.success(f"Prediction : {prediction}")
-        else:
-            st.error("Error fetching prediction. Check FastAPI logs.")
+                st.error("Error fetching prediction. Check FastAPI logs.")
+                st.json(response.json())
+        except Exception as e:
+            st.error(f"Request failed: {e}")
 
-    elif mode == "Batch Upload":
-        st.title("Batch Upload for Prediction")
-        uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+elif mode == "Batch Upload":
+    st.title("Batch Upload for Prediction")
+    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
 
-        if uploaded_file:
-            try:
-                df = pd.read_csv(uploaded_file)
-                st.write("Uploaded Data Preview:", df.head())
+    if uploaded_file:
+        try:
+            df = pd.read_csv(uploaded_file)
+            st.write("Uploaded Data Preview:", df.head())
 
-                if st.button("Make Batch Predictions"):
-                    files = {"file": ("input.csv", uploaded_file.getvalue(), "text/csv")}
-                    response = requests.post(f"{FASTAPI_URL}/predict_batch", files=files)
+            if st.button("Make Batch Predictions"):
+                files = {"file": ("input.csv", uploaded_file.getvalue(), "text/csv")}
+                response = requests.post(f"{FASTAPI_URL}/predict_batch?model={model_param}", files=files)
 
-                    if response.status_code == 200:
-                        predictions = response.json()["predictions"]
-                        df["Predictions"] = predictions
-                        st.subheader("Predictions:")
-                        st.dataframe(df)
-                    else:
-                        st.error("Prediction failed.")
-                        st.json(response.json())
+                if response.status_code == 200:
+                    predictions = response.json()["predictions"]
+                    probabilities = response.json().get("probabilities", [None] * len(predictions))
+                    df["Predictions"] = predictions
+                    df["Probabilities"] = probabilities
 
-            except Exception as e:
-                st.error(f"Failed to process file: {e}")
+                    def highlight_risk(row):
+                        prob = row["Probabilities"]
+                        if prob is not None and prob > 0.7:
+                            return ['background-color: #ffcccc'] * len(row)
+                        return [''] * len(row)
+
+                    st.subheader("Predictions:")
+                    st.dataframe(df.style.apply(highlight_risk, axis=1))
+                else:
+                    st.error("Prediction failed.")
+                    st.json(response.json())
+
+        except Exception as e:
+            st.error(f"Failed to process file: {e}")

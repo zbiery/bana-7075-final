@@ -1,0 +1,6 @@
+LeadTime,Adults,Children,PreviousCancellations,PreviousBookingsNotCanceled,DaysInWaitingList,CustomerType,DepositType,DistributionChannel,StayType,TotalNights,HasBabies,HasMeals,HasParking
+72,2,0,0,1,0,Transient,No Deposit,TA/TO,Weekend,3,0,1,0
+30,1,1,0,2,0,Transient-Party,Non Refund,Direct,Weekday,2,1,0,1
+120,2,0,1,0,5,Non-Transient,Refundable,Corporate,Mixed,4,0,1,0
+45,3,0,0,1,0,Transient,No Deposit,TA/TO,Weekday,5,0,0,1
+15,2,2,0,0,2,Transient-Party,No Deposit,Direct,Weekend,2,1,1,0
