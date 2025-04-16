@@ -1,0 +1,46 @@
+artifact_path: pytorch_nn
+flavors:
+  python_function:
+    config:
+      device: null
+    data: data
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pytorch
+    pickle_module_name: mlflow.pytorch.pickle_module
+    python_version: 3.10.0
+  pytorch:
+    code: null
+    model_data: data
+    pytorch_version: 2.6.0+cpu
+is_signature_from_type_hint: false
+mlflow_version: 2.21.3
+model_size_bytes: 23974
+model_uuid: 34f857ac12b14599ab274d60c9896f95
+prompts: null
+run_id: f04e0c2de7e64789ba1f9eb293f3214b
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "float", "name": "LeadTime", "required": true}, {"type": "float",
+    "name": "Adults", "required": true}, {"type": "float", "name": "Children", "required":
+    true}, {"type": "float", "name": "PreviousCancellations", "required": true}, {"type":
+    "float", "name": "PreviousBookingsNotCanceled", "required": true}, {"type": "float",
+    "name": "DaysInWaitingList", "required": true}, {"type": "float", "name": "TotalNights",
+    "required": true}, {"type": "float", "name": "HasBabies", "required": true}, {"type":
+    "float", "name": "HasMeals", "required": true}, {"type": "float", "name": "HasParking",
+    "required": true}, {"type": "float", "name": "CustomerType_Transient", "required":
+    true}, {"type": "float", "name": "CustomerType_Transient-Party", "required": true},
+    {"type": "float", "name": "DistributionChannel_Direct", "required": true}, {"type":
+    "float", "name": "DistributionChannel_TA/TO", "required": true}, {"type": "float",
+    "name": "StayType_Weekend", "required": true}, {"type": "float", "name": "StayType_Mixed",
+    "required": true}, {"type": "float", "name": "DepositType_Non Refund", "required":
+    true}, {"type": "float", "name": "DepositType_Refundable", "required": true}]'
+  outputs: '[{"type": "float", "name": 0, "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-04-16 02:14:01.133880'
