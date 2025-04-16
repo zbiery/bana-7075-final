@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from src.logger import logger
@@ -150,7 +150,8 @@ def encode_data(df: pd.DataFrame) -> pd.DataFrame:
     logger.info("Starting one-hot encoding of categorical variables...")
 
     try:
-        encoded_df = pd.get_dummies(df, columns=["CustomerType", "DistributionChannel", "StayType", "DepositType"], drop_first=True)
+        to_encode = [col for col in ["CustomerType", "DistributionChannel", "StayType", "DepositType"] if col in df.columns]
+        encoded_df = pd.get_dummies(df, columns=to_encode, drop_first=True)
         logger.info(f"One-hot encoding completed.")
         return encoded_df
 
@@ -185,14 +186,20 @@ def split_data(df: pd.DataFrame, target: str = "IsCanceled", test_size: float = 
 
 EXCLUDED_COLUMNS = ["HasBabies", "HasMeals", "HasParking", "IsCanceled"]
 
-def scale_data(df: pd.DataFrame, how: str = "min-max") -> Tuple[pd.DataFrame, Union[MinMaxScaler, StandardScaler]]:
+def scale_data(df: pd.DataFrame, 
+               scaler: Optional[Union[MinMaxScaler, StandardScaler]] = None, 
+               how: Optional[str] = "min-max",
+               cast: bool = False
+               ) -> Tuple[pd.DataFrame, Union[MinMaxScaler, StandardScaler]]:
     """
     Fits a scaler on the training DataFrame and applies scaling to numeric features, 
     excluding predefined binary columns.
 
     Args:
         df (pd.DataFrame): Data to scale.
-        how (str): Scaling method: 'min-max' or 'z-score'.
+        scaler (MinMaxScaler, StandardScaler, None): The optional scaler to use.
+        how (str, None): Scaling method: 'min-max' or 'z-score'. Must be specified if scaler is not provided.
+        cast (bool): Whether or not to cast the resulting dataframe to have columns of type 'float32'. Necessary for Neural Network scaling.
 
     Returns:
         Tuple: (scaled DataFrame, fitted scaler)
@@ -206,15 +213,23 @@ def scale_data(df: pd.DataFrame, how: str = "min-max") -> Tuple[pd.DataFrame, Un
         df_to_scale = df[cols_to_scale]
         df_excluded = df.drop(columns=cols_to_scale)
 
-        scaler = MinMaxScaler() if how == "min-max" else StandardScaler()
-        scaled = scaler.fit_transform(df_to_scale)
+        if not scaler:
+            scaler = MinMaxScaler() if how == "min-max" else StandardScaler()
+            scaled = scaler.fit_transform(df_to_scale)
+        else:
+            scaled = scaler.transform(df_to_scale)
+
         scaled_df = pd.DataFrame(scaled, columns=cols_to_scale, index=df.index)
 
         result_df = pd.concat([scaled_df, df_excluded], axis=1)
         result_df = result_df[df.columns]
 
         logger.info("Data scaled successfully.")
-        return result_df
+
+        if cast:
+            return result_df.astype("float32"), scaler
+        else: 
+            return result_df, scaler
 
     except Exception as e:
         logger.error(f"Error in fit_and_scale_train: {e}")

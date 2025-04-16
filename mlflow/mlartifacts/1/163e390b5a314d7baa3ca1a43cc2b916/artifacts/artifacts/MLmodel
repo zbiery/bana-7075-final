@@ -1,0 +1,46 @@
+artifact_path: artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.10.0
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.6.1
+is_signature_from_type_hint: false
+mlflow_version: 2.21.3
+model_size_bytes: 3353
+model_uuid: 3e29fcf8f8d244ffabdfd951be5d1608
+prompts: null
+run_id: 163e390b5a314d7baa3ca1a43cc2b916
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "long", "name": "LeadTime", "required": true}, {"type": "long",
+    "name": "Adults", "required": true}, {"type": "long", "name": "Children", "required":
+    true}, {"type": "long", "name": "PreviousCancellations", "required": true}, {"type":
+    "long", "name": "PreviousBookingsNotCanceled", "required": true}, {"type": "long",
+    "name": "DaysInWaitingList", "required": true}, {"type": "long", "name": "TotalNights",
+    "required": true}, {"type": "integer", "name": "HasBabies", "required": true},
+    {"type": "integer", "name": "HasMeals", "required": true}, {"type": "integer",
+    "name": "HasParking", "required": true}, {"type": "boolean", "name": "CustomerType_Transient",
+    "required": true}, {"type": "boolean", "name": "CustomerType_Transient-Party",
+    "required": true}, {"type": "boolean", "name": "DistributionChannel_Direct", "required":
+    true}, {"type": "boolean", "name": "DistributionChannel_TA/TO", "required": true},
+    {"type": "boolean", "name": "StayType_Weekend", "required": true}, {"type": "boolean",
+    "name": "StayType_Mixed", "required": true}, {"type": "boolean", "name": "DepositType_Non
+    Refund     ", "required": true}, {"type": "boolean", "name": "DepositType_Refundable     ",
+    "required": true}]'
+  outputs: '[{"type": "long", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-04-14 03:40:13.429591'
