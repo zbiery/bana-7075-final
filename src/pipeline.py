@@ -34,16 +34,19 @@ def pipeline(model: str) -> Tuple[DataFrame,DataFrame,Series,Series] | Tuple[Dat
 
         if model == "tree":
             df_encoded = encode_data(df_engineered)
+            df_encoded.columns = df_encoded.columns.str.strip()
             x_train, x_test, y_train, y_test = split_data(df_encoded, random_state=1234)
             logger.info(f"SUCCESS: Pipeline for {model} succeeded.")
             return x_train, x_test, y_train, y_test
         elif model == "glm" or model == "gam":
             df_encoded = encode_data(df_engineered)
+            df_encoded.columns = df_encoded.columns.str.strip()
             x_train, x_test, y_train, y_test = split_data(df_encoded, random_state=1234)
             logger.info(f"SUCCESS: Pipeline for {model} succeeded.")
             return x_train, x_test, y_train, y_test
         elif model == "nnet":
             df_encoded = encode_data(df_engineered)
+            df_encoded.columns = df_encoded.columns.str.strip()
             x_train, x_test, y_train, y_test = split_data(df_encoded, random_state=1234)
             x_train, scaler = scale_data(x_train, how="min-max")
             x_test, _ = scale_data(x_test, scaler=scaler)

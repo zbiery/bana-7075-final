@@ -1,6 +1,7 @@
 import os
 import mlflow
 import mlflow.sklearn
+import mlflow.pytorch
 import pandas as pd
 from typing import Union
 from sklearn.linear_model import LogisticRegression
@@ -48,8 +49,7 @@ def train_lr_model(
     solver: str = 'lbfgs',
     penalty: str = 'l2',
     return_model: bool = False,
-    run_name: str = "Logistic Regression",
-    artifact_path: str = "artifacts"
+    run_name: str = "Logistic Regression"
 ):
     """
     Trains a logistic regression model, evaluates it, and logs parameters, metrics,
@@ -97,25 +97,29 @@ def train_lr_model(
         # Evaluate
         train_acc = model.score(x_train, y_train)
         test_acc = model.score(x_test, y_test)
-        f1 = f1_score(y_test, model.predict(x_test))
+        y_test_preds =  model.predict(x_test)
+        acc = accuracy_score(y_test, y_test_preds)
+        prec = precision_score(y_test, y_test_preds, zero_division=0)
+        rec = recall_score(y_test, y_test_preds, zero_division=0)
+        f1 = f1_score(y_test, y_test_preds, zero_division=0)
 
-        # Log metrics
         mlflow.log_metrics({
-            "train_accuracy": train_acc,
-            "test_accuracy": test_acc,
+            "accuracy": acc,
+            "precision": prec,
+            "recall": rec,
             "f1_score": f1
         })
 
         # Log model
         mlflow.sklearn.log_model(
             sk_model=model,
-            artifact_path=artifact_path,
+            artifact_path="sklearn_lr",
             input_example=x_test.head(3)
         )
 
         logger.info(
-            f"Model trained. Train acc: {train_acc:.4f}, "
-            f"Test acc: {test_acc:.4f}, F1: {f1:.4f}"
+            f"Model trained. Accuracy: {acc:.4f}, Precision: {prec:.4f}, "
+            f"Recall: {rec:.4f}, F1: {f1:.4f}"
         )
 
         if return_model:
@@ -133,8 +137,7 @@ def train_nn_model(
     hidden_dims=(64, 32),
     return_model=False,
     return_loss=False,
-    run_name="Neural Network",
-    artifact_path="artifacts"
+    run_name="Neural Network"
 ):
     mlflow.set_experiment("hotel_cancellation_nn")
 
@@ -236,7 +239,7 @@ def train_nn_model(
         # Log model
         mlflow.pytorch.log_model(
             model, 
-            artifact_path, 
+            artifact_path="pytorch_nn", 
             input_example=x_test.head(2))
 
         # Log scaler

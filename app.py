@@ -62,7 +62,12 @@ if mode == "Manual Entry":
             if response.status_code == 200:
                 result = response.json()
                 prediction = result["predictions"][0]
-                probability = result.get("probabilities", [None])[0]
+                probability = result.get("probabilities")
+                if probability is not None:
+                    probability = probability[0]
+                else:
+                    probability = None
+
                 msg = "Cancellation" if prediction > 0.5 else "Non-Cancellation"
 
                 if probability is not None:
