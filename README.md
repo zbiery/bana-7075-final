@@ -27,9 +27,9 @@ Our system is designed to be modular, scalable, and easy to maintain, with clear
 ### Data Pipeline
 The data pipeline is designed to be **modular, interpretable, and adaptable** for multiple modeling strategies, ensuring high-quality input for training and testing through 4 modular stages.
 
-- **Ingestion (`ingestion.py`)** pulls raw hotel reservation data—40,060 records with 32 variables—into the system. This raw dataset includes various features such as booking behavior, guest type, and reservation details.
+- **Ingestion (`ingestion.py`)** pulls raw hotel reservation data into the system. This raw dataset includes various features such as booking behavior, guest type, and reservation details.
 
-- **Preprocessing (`preprocessing.py`)** applies structured data cleaning and feature engineering. After removing invalid or redundant records and transforming inputs, the dataset is reduced to 34,683 high-quality samples across 14 core features.
+- **Preprocessing (`preprocessing.py`)** applies structured data cleaning and feature engineering.
 
 - **Validation and Versioning (`validation.py`)** ensures that the data is accurate and consistent, applying validation checks to preserve data integrity. Validated datasets are versioned to ensure reproducibility and traceability throughout the modeling lifecycle.
 
@@ -40,125 +40,6 @@ The data pipeline is designed to be **modular, interpretable, and adaptable** fo
 This pipeline outputs ready-to-use training and testing datasets that are structurally optimized for each ML model type. The clear separation of responsibilities across scripts (e.g., ingestion, preprocessing, validation) contributes to the system’s **flexibility and maintainability**, allowing for seamless updates and easy expansion to new model architectures.
 
 ![Data Pipeline](./docs/assets/data_pipeline.jpg)
-
-## Usage
-### Set Up
-To begin working with this repository, follow these steps:
-1. Clone the repository
-```bash
-# Navigate to the directory in which you wish to clone the repo
-cd your/preffered/location
-
-# Clone the repository
-git clone https://github.com/zbiery/bana-7075-final.git
-
-# (Optional) Open VSCode to begin working
-code .
-```
-2. **Recommended (Optional)**: Create a virtual environment
-```bash
-# Create a virtual environment
-python -m venv .venv
-
-# Activate environment
-# For Windows:
-.venv/Scripts/activate.bat
-
-# For MacOS/Linux:
-.venv/scripts/activate.sh
-
-```
-
-3. Download dependencies
-```bash
-# Download required dependencies
-pip install -r requirements.txt
-```
-
-4. Create a ```.env``` file in the project root to store your secrets, etc.
-
-Once the initial setup has been completed, to carry out model training, you must start the MLFlow server.
-
-```bash
-# For Windows:
-./mlflow_server.ps1
-
-# For MacOS/Linux:
-./mlflow_server.sh
-```
-
-To start the prediction application, run the ```main.py``` file.
-```bash
-python main.py
-```
-
-### Examples
-Conducting model training
-Full support exists for 3 model types: Logistic Regression (sklearn), Random Forest (sklearn), Neural Network (pytorch)
-
-```python
-#model_training.py
-
-from src.pipeline import pipeline
-from src.training import train_lr_model, train_nn_model, train_rf_model
-
-# Get the training and testing datasets from the data pipeline
-# Must return a scaler object 
-x_train, x_test, y_train, y_test, scaler = pipeline(model="nnet")
-
-# Train & register a Neural Network model
-train_nn_model(x_train, 
-               y_train, 
-               x_test, 
-               y_test, 
-               scaler=scaler,
-               lr=0.001,
-               hidden_dims=(64,32,16),
-               epochs=25,
-               run_name="Neural Network")
-
-# Get the training and testing datasets from the data pipeline
-# No scaler to be returned here
-x_train, x_test, y_train, y_test = pipeline(model="glm")
-
-# Train & register a Logistic Regression model
-train_lr_model(x_train, 
-               y_train, 
-               x_test, 
-               y_test,
-               C=1,
-               max_iter=100,
-               solver='lbfgs',
-               penalty='l2')
-
-```
-
-If you have registered a new model in MLFlow and want the application to use it, go to ```fastapi_app.py``` and update the ```MODEL_REGISTRY``` variable by providing a new uri under the appropriate family.
-
-```python
-MODEL_REGISTRY = {
-    "glm": {
-        "uri": "models:/lr_champion/2",
-        "type": "pyfunc",
-        "requires_scaler": False,
-    },
-    "nnet": {
-        "uri": "models:/nn_champion/2",
-        "type": "pytorch",
-        "requires_scaler": True,
-    },
-    "tree": {
-        "uri": "models:/rf_champion/1",
-        "type": "pyfunc",
-        "requires_scaler": False
-    }
-}
-```
-If you want to create a new model that exists within the current supported family types (glm, nnet, tree) you must create a training function for that model in ```training.py``` with the same signature (structure) as the other training functions. Then, you must add the model to the ```MODEL_REGISTRY``` in the ```fastapi_app.py``` file. The rest of the code should work as intended.
-
-Your `Usage` section is already very thorough and well-structured. Here’s a **refined version** with some improvements to formatting, grammar, and clarity while keeping the tone consistent and instructional:
-
----
 
 ## Usage
 
@@ -205,16 +86,16 @@ Create a `.env` file in the project root to securely store environment-specific 
 ---
 ### Application Use 
 
-To start the application & begin using it, run:
+To **start the application** & begin using it, run:
 
 ```bash
 python main.py
 ```
-And, then navigate to you web browser to begin using the Streamlit app.
+Then navigate to you web browser to begin using the Streamlit app.
 
 ### Model Training
 
-Start the MLflow server before training to log runs and register models:
+**Start the MLflow server** before training to log runs and register models:
 
 ```bash
 # Windows
@@ -234,36 +115,42 @@ This repository supports training and tracking of:
 Model training should be conducted in the ```model_training.py``` script. To do so, simply retrieve your training and testing datasets using the pipeline function, and then specify the parameters to be used in the train function(s) - everything else will be handled for you!
 
 ```python
-# model_training.py
-
 from src.pipeline import pipeline
 from src.training import train_lr_model, train_nn_model, train_rf_model
 
-# Train a neural network
+# Get the training and testing datasets from the data pipeline
+# Must return a scaler object 
 x_train, x_test, y_train, y_test, scaler = pipeline(model="nnet")
-train_nn_model(
-    x_train, y_train, x_test, y_test,
-    scaler=scaler,
-    lr=0.001,
-    hidden_dims=(64, 32, 16),
-    epochs=25,
-    run_name="Neural Network"
-)
 
-# Train logistic regression
+# Train & register a Neural Network model
+train_nn_model(x_train, 
+               y_train, 
+               x_test, 
+               y_test, 
+               scaler=scaler,
+               lr=0.001,
+               hidden_dims=(64,32,16),
+               epochs=25,
+               run_name="Neural Network")
+
+# Get the training and testing datasets from the data pipeline
+# No scaler to be returned here
 x_train, x_test, y_train, y_test = pipeline(model="glm")
-train_lr_model(
-    x_train, y_train, x_test, y_test,
-    C=1.0,
-    max_iter=100,
-    solver="lbfgs",
-    penalty="l2"
-)
+
+# Train & register a Logistic Regression model
+train_lr_model(x_train, 
+               y_train, 
+               x_test, 
+               y_test,
+               C=1,
+               max_iter=100,
+               solver='lbfgs',
+               penalty='l2')
 ```
 
 ### Model Deployment (Updating Models for Inference)
 
-Once you have trained and registered a new model version in MLflow, update the following block in `fastapi_app.py`:
+Once you have trained and registered a new model version in MLflow, update the following block in `fastapi_app.py` by updating the uri.
 
 ```python
 MODEL_REGISTRY = {
