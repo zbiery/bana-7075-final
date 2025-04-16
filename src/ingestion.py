@@ -28,7 +28,8 @@ def get_data(filename: str = "H1.csv") -> pd.DataFrame:
         FileNotFoundError: If the specified CSV file is not found after extraction.
         Exception: If reading the CSV into a DataFrame fails.
     """
-
+    if not zip_url:
+        zip_url = "https://ars.els-cdn.com/content/image/1-s2.0-S2352340918315191-mmc2.zip"
     logger.info(f"Starting data download from: {zip_url}")
 
     try:
