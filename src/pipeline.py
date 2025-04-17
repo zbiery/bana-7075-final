@@ -6,13 +6,15 @@ from src.preprocessing import clean_data, create_features, encode_data, scale_da
 from src.validation import validate_data, version_data
 from src.logger import logger
 
-def pipeline(model: str) -> Tuple[DataFrame,DataFrame,Series,Series] | Tuple[DataFrame,DataFrame,Series,Series, Union[StandardScaler, MinMaxScaler]]:
+def pipeline(model: str, filename: str = "H1.csv") -> Tuple[DataFrame,DataFrame,Series,Series] | Tuple[DataFrame,DataFrame,Series,Series, Union[StandardScaler, MinMaxScaler]]:
     """
     Runs the full data pipeline: ingest -> clean -> engineer -> validate -> encode/split/scale,
     depending on the model type.
 
     Args:
         model (str): Model type. Supported values: ['glm', 'gam', 'tree', 'nnet']
+        filename (str): The name of the CSV file to load from the extracted ZIP archive. 
+                        Defaults to 'H1.csv'.
 
     Returns:
         Tuple[DataFrame, DataFrame, Series, Series]: x_train, x_test, y_train, y_test
@@ -25,7 +27,7 @@ def pipeline(model: str) -> Tuple[DataFrame,DataFrame,Series,Series] | Tuple[Dat
         raise ValueError(f"Unsupported model type: {model}")
     
     try: 
-        df_raw = get_data(filename="H1.csv")
+        df_raw = get_data(filename=filename)
         df_cleaned = clean_data(df_raw)
         df_engineered = create_features(df_cleaned)
 

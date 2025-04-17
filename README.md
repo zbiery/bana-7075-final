@@ -196,6 +196,7 @@ BANA-7075-FINAL/
 ├── docs/                    # Additional documentation
 │   └── assets/              # Diagrams, figures, etc.
 ├── logs/                    # Logging outputs
+├── reports/                 # Model monitoring reports
 ├── mlflow/                  # MLflow tracking files (artifacts)
 │
 ├── src/                     # Core application logic
@@ -219,6 +220,7 @@ BANA-7075-FINAL/
 ├── model_training.py        # Orchestrator for training all models
 ├── mlflow_server.sh         # Shell script to run MLflow server
 ├── mlflow_server.ps1        # PowerShell script to run MLflow server
+├── requirements.txt         # Dependencies
 └── README.md                # Project overview & usage instructions
 
 ```

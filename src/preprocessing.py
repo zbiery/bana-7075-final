@@ -108,6 +108,10 @@ def create_features(df: pd.DataFrame) -> pd.DataFrame:
         df["HasMeals"] = (df["Meal"] != "SC").astype(int)
         df["HasParking"] = (df["RequiredCarParkingSpaces"] != 0).astype(int)
 
+        # Type conversion
+        df["Adults"] = df["Adults"].astype(int)
+        df["Children"] = df["Children"].astype(int)
+
         # Re-map CustomerType and DistributionChannel
         df["CustomerType"] = df["CustomerType"].map({
             "Contract": "Non-Transient",
