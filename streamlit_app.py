@@ -32,7 +32,6 @@ if mode == "Manual Entry":
     has_babies = st.selectbox("Has Babies?", [0, 1])
     has_meals = st.selectbox("Has Meals (not SC)?", [0, 1])
     has_parking = st.selectbox("Has Parking?", [0, 1])
-    is_canceled = st.selectbox("Booking Canceled?", [0, 1])
 
     customer_type = st.selectbox("Customer Type", ["Transient", "Transient-Party", "Non-Transient"])
     deposit_type = st.selectbox("Deposit Type", ["No Deposit", "Non Refund", "Refundable"])

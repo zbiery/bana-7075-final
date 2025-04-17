@@ -10,6 +10,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel
 from mlflow.tracking import MlflowClient
 from src.predicting import predict_glm, predict_nnet, predict_tree
+from src.logger import log_request
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -88,11 +89,22 @@ def predict_single(input_data: List[InputData], model: str = "glm"):
             preds, probs = predict_tree(df, loaded_model)
         else:
             raise ValueError(f"Unsupported model: {model}")
+        
+        log_request(request_type="single", 
+                    input_data=df.to_dict(orient="records"), 
+                    predictions=preds, 
+                    probs=probs,
+                    status="Success")
 
         return {"predictions": preds, "probabilities": probs}
 
     except Exception as e:
         traceback.print_exc()
+        log_request(request_type="single", 
+                    input_data=df.to_dict(orient="records"), 
+                    predictions=None, 
+                    probs=probs,
+                    status=f"Error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
 @app.post("/predict_batch")
@@ -114,8 +126,19 @@ async def predict_batch(file: UploadFile = File(...), model: str = "glm"):
         else:
             raise ValueError(f"Unsupported model: {model}")
 
+        log_request(request_type="batch", 
+                    input_data=df.to_dict(orient="records"), 
+                    predictions=preds, 
+                    probs=probs,
+                    status="Success")
+
         return {"predictions": preds, "probabilities": probs}
 
     except Exception as e:
         traceback.print_exc()
+        log_request(request_type="batch", 
+                    input_data=df.to_dict(orient="records"), 
+                    predictions=None, 
+                    probs=probs,
+                    status=f"Error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")

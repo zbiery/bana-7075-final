@@ -44,9 +44,9 @@ def validate_data(df: pd.DataFrame) -> bool:
             "DistributionChannel": "CategoricalDtypeType",
             "StayType": "CategoricalDtypeType",
             "TotalNights": "int64",
-            "HasBabies": "int32",
-            "HasMeals": "int32",
-            "HasParking": "int32",
+            "HasBabies": "int64",
+            "HasMeals": "int64",
+            "HasParking": "int64",
             "IsCanceled": "int64"
         }
 
