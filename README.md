@@ -91,7 +91,18 @@ To **start the application** & begin using it, run:
 ```bash
 python main.py
 ```
-Then navigate to you web browser to begin using the Streamlit app.
+This will:
+- Start the FastAPI app on port 1000
+- Start the Streamlit UI on port 8501
+- Start the MLflow server on port 5000
+
+You can then navigate to your web browser to begin using the Streamlit app.
+
+Alternatively, if you already have [Docker](https://www.docker.com/) installed on your desktop, run:
+
+```bash
+docker-compose up --build
+```
 
 ### Model Training
 

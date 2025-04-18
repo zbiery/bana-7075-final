@@ -10,7 +10,7 @@ services:
       mlflow server
       --backend-store-uri sqlite:///mlflow/mlflow.db
       --artifacts-destination ./mlflow/mlartifacts
-      --host 127.0.0.1
+      --host 0.0.0.0
       --port 5000
 
   app:
@@ -26,7 +26,7 @@ services:
 
   streamlit:
     build: .
-    command: streamlit run streamlit_app.py --server.port 8501 --server.address 127.0.0.1
+    command: streamlit run streamlit_app.py --server.port 8501 --server.address 0.0.0.0
     ports:
       - "8501:8501"
     depends_on:
