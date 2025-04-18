@@ -191,6 +191,8 @@ BANA-7075-FINAL/
 ├── .dvcignore               # DVC ignore rules
 ├── .env                     # Environment variables (e.g., secrets, ports)
 ├── .gitignore               # Git ignore rules
+├── .gitattributes            
+├── .dockerignore            # Docker ignore rules
 ├── .venv/                   # Virtual environment (excluded from Git)
 ├── data/                    # Data files (raw/processed)
 ├── docs/                    # Additional documentation
@@ -220,6 +222,8 @@ BANA-7075-FINAL/
 ├── model_training.py        # Orchestrator for training all models
 ├── mlflow_server.sh         # Shell script to run MLflow server
 ├── mlflow_server.ps1        # PowerShell script to run MLflow server
+├── Dockerfile               # Docker environment
+├── docker-compose.yml       # Runs application in container
 ├── requirements.txt         # Dependencies
 └── README.md                # Project overview & usage instructions
 

@@ -1,6 +1,5 @@
 import pandas as pd
 import subprocess
-import logging
 import great_expectations as gx
 from great_expectations.expectations import ExpectColumnToExist, ExpectColumnValuesToBeOfType, ExpectColumnValuesToNotBeNull
 from great_expectations.core import ExpectationSuiteValidationResult
